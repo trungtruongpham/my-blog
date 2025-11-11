@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Trung Truong Dev Blog",
-  description: "A minimalist developer blog built with Next.js",
+  title: "Invert Dev Blog",
+  description: "A blog about web development, programming, and technology.",
 };
 
 export default function RootLayout({
