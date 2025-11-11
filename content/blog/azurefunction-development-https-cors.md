@@ -33,11 +33,14 @@ Export-PfxCertificate -Cert $cert -FilePath certificate.pfx -Password (ConvertTo
 ```
 
 - After executing the aforementioned commands, Powershell will generate a **certificate.pfx** file.
+- ![Azure Function dev certificate created](https://pub-103a884188154ce0be014e191930b9c3.r2.dev/azurefunction-1.png)
 - Open your project's configuration and input the command to run the Azure Function:
 
 ```bash
 host start --port 5007 --useHttps --cert certificate.pfx --password 123
 ```
+
+![Azure Function running with HTTPS locally](https://pub-103a884188154ce0be014e191930b9c3.r2.dev/azurefunction-2.png)
 
 **Note:** Please be aware that Rider will build our project and run in **bin/debug/net8.0** folder, so we need to copy **certificate.pfx** file to this folder.
 
@@ -56,15 +59,15 @@ There are two methods to set CORS values for AzureFunction:
 
    - Configure CORS settings directly in your local configuration file
    - Allows for environment-specific CORS policies
+   - ![Local CORS settings in local.settings.json](https://pub-103a884188154ce0be014e191930b9c3.r2.dev/azurefunction-3.png)
 
 2. **Add CORS value to build arguments:**
    - Pass CORS configuration during the build/run process
    - Useful for dynamic configuration
+   - ![CORS value passed via build/run arguments](https://pub-103a884188154ce0be014e191930b9c3.r2.dev/azurefunction-4.png)
 
 ## Conclusion
 
 In conclusion, developing with Azure Function presents unique challenges, but with the right knowledge, these can be easily overcome. Ensuring secure connections through HTTPS and setting up CORS correctly are crucial steps. By sharing these insights, I hope to help other developers navigate these aspects of Azure Function more easily. Always remember to closely follow documentation, keep up with updates, and exchange knowledge with your fellow developers. Happy coding!
 
 ---
-
-_Source: [Invert Dev](https://invert-dev.com/2024/05/05/azurefunction-development-issues/)_

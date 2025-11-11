@@ -14,15 +14,6 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          Welcome to My Blog
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Thoughts on web development, programming, and technology.
-        </p>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-1">
         {posts.map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`}>

@@ -29,7 +29,7 @@ export default function RootLayout({
                   href="/"
                   className="text-2xl font-bold text-foreground hover:text-primary transition-colors"
                 >
-                  Trung Truong Dev Blog
+                  Invert Dev Blog
                 </Link>
                 <div className="flex gap-6">
                   <Link
@@ -54,8 +54,8 @@ export default function RootLayout({
           <footer className="border-t border-border mt-20">
             <div className="container mx-auto px-4 py-8 max-w-4xl">
               <p className="text-center text-muted-foreground text-sm">
-                © {new Date().getFullYear()} Dev Blog. Built with Next.js &
-                Supabase.
+                © {new Date().getFullYear()} Invert Dev Blog. Built with
+                Next.js.
               </p>
             </div>
           </footer>
