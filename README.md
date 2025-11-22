@@ -1,6 +1,15 @@
 # my-blog
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A high-performance blog built with Next.js 15, featuring beautiful typography, MDX support, and optimized rendering.
+
+## Features
+
+- ⚡ **Blazing Fast** - Static generation with ISR (Incremental Static Regeneration)
+- 🎨 **Beautiful Design** - Editorial-inspired UI with Playfair Display and Outfit fonts
+- 📝 **MDX Support** - Write blog posts in Markdown with syntax highlighting
+- 📊 **View Counter** - Track post views with Supabase (optional)
+- 🌙 **Dark Mode** - Elegant dark theme support
+- 🚀 **Performance Optimized** - Sub-500ms page loads with caching
 
 ## Getting Started
 
@@ -20,7 +29,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load custom Google Fonts.
+
+## Performance
+
+This blog is highly optimized for speed:
+
+- Static generation with 1-hour revalidation
+- Non-blocking view counters with React Suspense
+- Supabase integration with 2-second timeouts
+- Next.js font optimization for fast loading
+
+See [PERFORMANCE.md](./PERFORMANCE.md) for detailed information and Supabase setup instructions.
 
 ## Learn More
 

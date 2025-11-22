@@ -45,47 +45,64 @@ export async function getViewCount(slug: string): Promise<number> {
   }
 }
 
+// Helper function to add timeout to promises
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("Request timeout")), timeoutMs)
+    ),
+  ]);
+}
+
 export async function incrementViewCount(slug: string): Promise<number> {
   if (!isSupabaseConfigured()) {
     return 0;
   }
 
   try {
-    // First, try to get the current count
-    const { data: existingData } = await supabase
-      .from("views")
-      .select("view_count")
-      .eq("slug", slug)
-      .single();
+    // Use RPC function for atomic increment (single database call)
+    // Fallback to SELECT+UPDATE if RPC doesn't exist
+    const incrementPromise = supabase.rpc("increment_view_count", {
+      post_slug: slug,
+    });
 
-    if (existingData) {
-      // Update existing record
-      const newCount = (existingData.view_count || 0) + 1;
-      const { error } = await supabase
-        .from("views")
-        .update({ view_count: newCount })
-        .eq("slug", slug);
+    const { data, error } = await withTimeout(incrementPromise, 2000); // 2 second timeout
 
-      if (error) {
-        console.error("Error updating view count:", error);
-        return existingData.view_count || 0;
+    if (error) {
+      // Fallback to legacy method
+      const { data: existingData } = await withTimeout(
+        supabase.from("views").select("view_count").eq("slug", slug).single(),
+        1000
+      );
+
+      if (existingData) {
+        // Update existing record
+        const newCount = (existingData.view_count || 0) + 1;
+        await withTimeout(
+          supabase
+            .from("views")
+            .update({ view_count: newCount })
+            .eq("slug", slug),
+          1000
+        );
+        return newCount;
+      } else {
+        // Insert new record
+        await withTimeout(
+          supabase.from("views").insert({ slug, view_count: 1 }),
+          1000
+        );
+        return 1;
       }
-
-      return newCount;
-    } else {
-      // Insert new record
-      const { error } = await supabase
-        .from("views")
-        .insert({ slug, view_count: 1 });
-
-      if (error) {
-        console.error("Error inserting view count:", error);
-        return 0;
-      }
-
-      return 1;
     }
-  } catch {
+
+    return (data as number) || 1;
+  } catch (error) {
+    // Silent fail - don't block page rendering for view counts
+    if (process.env.NODE_ENV === "development") {
+      console.warn("View count failed:", error);
+    }
     return 0;
   }
 }
