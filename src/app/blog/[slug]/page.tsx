@@ -163,7 +163,7 @@ export default async function BlogPost({ params }: PageProps) {
             className="absolute top-8 left-8 text-9xl font-serif text-amber-200/30 dark:text-amber-900/30 select-none"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            "
+            &ldquo;
           </div>
 
           <header className="relative space-y-6">
