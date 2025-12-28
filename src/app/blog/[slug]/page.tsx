@@ -26,6 +26,8 @@ export async function generateStaticParams() {
   }));
 }
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://invertdev.blog";
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
@@ -36,16 +38,53 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
+  const postUrl = `${siteUrl}/blog/${slug}`;
+  const ogImage = `${siteUrl}/og-image.png`; // You can make this dynamic per post
+
   return {
     title: post.title,
     description: post.description,
+    keywords: post.tags,
+    authors: [{ name: "Invert Dev" }],
+
+    // Canonical URL
+    alternates: {
+      canonical: postUrl,
+    },
+
+    // Open Graph
+    openGraph: {
+      type: "article",
+      url: postUrl,
+      title: post.title,
+      description: post.description,
+      publishedTime: post.date,
+      authors: ["Invert Dev"],
+      tags: post.tags,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+
+    // Twitter
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [ogImage],
+    },
   };
 }
 
 // Loading fallback for view counter
 function ViewCounterSkeleton() {
   return (
-    <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+    <span className="flex items-center gap-2 text-muted-foreground">
       <svg
         className="w-4 h-4"
         fill="none"
@@ -65,7 +104,7 @@ function ViewCounterSkeleton() {
           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
         />
       </svg>
-      <span className="inline-block w-16 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+      <span className="inline-block w-16 h-4 bg-secondary rounded animate-pulse" />
     </span>
   );
 }
@@ -75,7 +114,7 @@ async function ViewCounter({ slug }: { slug: string }) {
   const viewCount = await incrementViewCount(slug);
 
   return (
-    <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+    <span className="flex items-center gap-2 text-muted-foreground">
       <svg
         className="w-4 h-4"
         fill="none"
@@ -125,13 +164,49 @@ export default async function BlogPost({ params }: PageProps) {
     },
   };
 
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      "@type": "Person",
+      name: "Invert Dev",
+      url: siteUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Invert Dev Blog",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/icon.svg`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/blog/${slug}`,
+    },
+    keywords: post.tags.join(", "),
+    articleSection: post.tags[0] || "Technology",
+    image: `${siteUrl}/og-image.png`,
+    url: `${siteUrl}/blog/${slug}`,
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Back navigation */}
       <div className="max-w-4xl mx-auto px-6 pt-8 pb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors group"
+          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors group"
           style={{ fontFamily: "var(--font-outfit)" }}
         >
           <svg
@@ -154,13 +229,13 @@ export default async function BlogPost({ params }: PageProps) {
       <article className="max-w-4xl mx-auto px-6 pb-24">
         {/* Decorative header background */}
         <div className="relative mb-16 -mx-6 px-6 py-16 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-amber-950/20 dark:to-slate-900 opacity-50" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-300/20 dark:bg-amber-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-300/20 dark:bg-orange-500/10 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-card" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
 
           {/* Decorative quote marks */}
           <div
-            className="absolute top-8 left-8 text-9xl font-serif text-amber-200/30 dark:text-amber-900/30 select-none"
+            className="absolute top-8 left-8 text-9xl font-serif text-muted/30 select-none"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
             &ldquo;
@@ -173,7 +248,7 @@ export default async function BlogPost({ params }: PageProps) {
                 {post.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 bg-amber-100 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-full text-xs font-medium text-amber-700 dark:text-amber-300"
+                    className="px-3 py-1.5 bg-secondary/50 border border-border/50 rounded-full text-xs font-medium text-secondary-foreground"
                     style={{ fontFamily: "var(--font-outfit)" }}
                   >
                     {tag}
@@ -184,7 +259,7 @@ export default async function BlogPost({ params }: PageProps) {
 
             {/* Title */}
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-slate-900 dark:text-slate-100 opacity-0 animate-fade-in delay-200"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground opacity-0 animate-fade-in delay-200"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {post.title}
@@ -192,7 +267,7 @@ export default async function BlogPost({ params }: PageProps) {
 
             {/* Description */}
             <p
-              className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl opacity-0 animate-fade-in delay-300"
+              className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl opacity-0 animate-fade-in delay-300"
               style={{ fontFamily: "var(--font-outfit)", fontWeight: 300 }}
             >
               {post.description}
@@ -205,7 +280,7 @@ export default async function BlogPost({ params }: PageProps) {
             >
               <time
                 dateTime={post.date}
-                className="flex items-center gap-2 text-slate-600 dark:text-slate-400"
+                className="flex items-center gap-2 text-muted-foreground"
               >
                 <svg
                   className="w-4 h-4"
@@ -223,7 +298,7 @@ export default async function BlogPost({ params }: PageProps) {
                 <span>{format(new Date(post.date), "MMMM dd, yyyy")}</span>
               </time>
 
-              <span className="text-slate-400 dark:text-slate-600">•</span>
+              <span className="text-muted-foreground/50">•</span>
 
               <Suspense fallback={<ViewCounterSkeleton />}>
                 <ViewCounter slug={slug} />
@@ -234,9 +309,9 @@ export default async function BlogPost({ params }: PageProps) {
 
         {/* Decorative divider */}
         <div className="flex items-center gap-4 mb-16 opacity-0 animate-fade-in delay-500">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 dark:via-amber-700 to-transparent" />
-          <div className="w-2 h-2 rounded-full bg-amber-400 dark:bg-amber-600" />
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 dark:via-amber-700 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          <div className="w-2 h-2 rounded-full bg-primary" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
 
         {/* Article content */}
@@ -247,15 +322,15 @@ export default async function BlogPost({ params }: PageProps) {
         </div>
 
         {/* End decorative element */}
-        <div className="mt-20 pt-12 border-t border-amber-200 dark:border-amber-900">
+        <div className="mt-20 pt-12 border-t border-border/50">
           <div className="flex items-center justify-center gap-3">
-            <div className="w-12 h-px bg-gradient-to-r from-transparent to-amber-400 dark:to-amber-600" />
+            <div className="w-12 h-px bg-gradient-to-r from-transparent to-primary" />
             <div className="flex gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 dark:bg-amber-600" />
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-500" />
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 dark:bg-amber-600" />
+              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
             </div>
-            <div className="w-12 h-px bg-gradient-to-l from-transparent to-amber-400 dark:to-amber-600" />
+            <div className="w-12 h-px bg-gradient-to-l from-transparent to-primary" />
           </div>
         </div>
       </article>

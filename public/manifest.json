@@ -1,0 +1,22 @@
+{
+  "name": "Invert Dev Blog",
+  "short_name": "Invert Dev",
+  "description": "Explore in-depth articles on web development, programming, Azure, .NET, React, Next.js, and modern software engineering practices.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["technology", "education", "blog"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
+
