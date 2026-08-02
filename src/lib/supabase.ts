@@ -56,7 +56,7 @@ export async function incrementViewCount(slug: string): Promise<number> {
     const rpcPromise = supabase.rpc("increment_view_count", {
       post_slug: slug,
     });
-    
+
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Request timeout")), 2000)
     );
